@@ -22,7 +22,11 @@ public class LoanController {
     private LoanService loanService;
     private CreditScoreService creditScoreService;
 
-    public LoanController(CustomerService customerService, AccountService accountService, LoanService loanService, CreditScoreService creditScoreService) {
+    public LoanController(
+            CustomerService customerService,
+            AccountService accountService,
+            LoanService loanService,
+            CreditScoreService creditScoreService) {
         this.customerService = customerService;
         this.accountService = accountService;
         this.loanService = loanService;
