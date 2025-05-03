@@ -1,6 +1,7 @@
 package com.balarawool.bootloom.abank.service;
 
 import com.balarawool.bootloom.abank.domain.Model;
+import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -16,8 +17,8 @@ public class CreditScoreService {
         this.restClient = restClient;
     }
 
-    public Model.CreditScore getCreditScore(Customer customer) {
-        try (var scope = StructuredTaskScope.open(Joiner.<Model.CreditScore>anySuccessfulResultOrThrow())) {
+    public CreditScore getCreditScore(Customer customer) {
+        try (var scope = StructuredTaskScope.open(Joiner.<CreditScore>anySuccessfulResultOrThrow())) {
             scope.fork(() -> getCreditScoreFrom("/credit-score1", customer));
             scope.fork(() -> getCreditScoreFrom("/credit-score2", customer));
 
@@ -28,7 +29,7 @@ public class CreditScoreService {
         }
     }
 
-    private Model.CreditScore getCreditScoreFrom(String endpoint, Customer customer) {
-        return restClient.get().uri("/customer/{id}"+endpoint, customer.id()).retrieve().body(Model.CreditScore.class);
+    private CreditScore getCreditScoreFrom(String endpoint, Customer customer) {
+        return restClient.get().uri("/customer/{id}"+endpoint, customer.id()).retrieve().body(CreditScore.class);
     }
 }

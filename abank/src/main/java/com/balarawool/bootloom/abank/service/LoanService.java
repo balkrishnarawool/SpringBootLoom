@@ -22,7 +22,7 @@ public class LoanService {
         return restClient.get().uri("/customer/{id}/loans", customer.id()).retrieve().body(List.class);
     }
 
-    public Offer calculateOffer(Customer customer, CreditScore creditScore, List<Account> accountsInfo, List<Loan> loansInfo) {
+    public Offer calculateOffer(Customer customer, List<Account> accountsInfo, List<Loan> loansInfo, CreditScore creditScore) {
         return restClient.get().uri("/customer/{id}/loans/offer", customer.id()).retrieve().body(Offer.class);
     }
 }
