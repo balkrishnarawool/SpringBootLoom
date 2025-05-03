@@ -25,7 +25,10 @@ public class LoanController {
     private LoanService loanService;
     private CreditScoreService creditScoreService;
 
-    public LoanController(CustomerService customerService, AccountService accountService, LoanService loanService, CreditScoreService creditScoreService) {
+    public LoanController(CustomerService customerService,
+                          AccountService accountService,
+                          LoanService loanService,
+                          CreditScoreService creditScoreService) {
         this.customerService = customerService;
         this.accountService = accountService;
         this.loanService = loanService;
@@ -38,7 +41,9 @@ public class LoanController {
         return ScopedValue.where(CURRENT_CUSTOMER, currentCustomer)
                 .call(() -> {
                     var customerInfo = getCustomerInfo();
-                    var offer = loanService.calculateOffer(customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore());
+                    var offer = loanService.calculateOffer(
+                            customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore()
+                    );
                     return offer;
                 });
     }
