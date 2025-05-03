@@ -1,8 +1,6 @@
 package com.balarawool.bootloom.abank.controller;
 
-import com.balarawool.bootloom.abank.domain.Model.Account;
-import com.balarawool.bootloom.abank.domain.Model.Customer;
-import com.balarawool.bootloom.abank.domain.Model.Loan;
+import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import com.balarawool.bootloom.abank.service.AccountService;
 import com.balarawool.bootloom.abank.service.CreditScoreService;
@@ -11,8 +9,7 @@ import com.balarawool.bootloom.abank.service.LoanService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class LoanController {
@@ -29,28 +26,21 @@ public class LoanController {
     }
 
     @GetMapping("/loan-application")
-    public Offer getLoan() {
-        var currentCustomer = customerService.getCurrentCustomer();
+    public CompletableFuture<Offer> getLoan() {
+        var currentCustomerCF = customerService.getCurrentCustomer();
 
-        var customerInfo = getCustomerInfo(currentCustomer);
-        var creditScore = creditScoreService.getCreditScore(currentCustomer);
-        var offer = loanService.calculateOffer(currentCustomer, creditScore, customerInfo.accounts(), customerInfo.loans());
-        return offer;
-    }
+        var accountsInfoCF = currentCustomerCF.thenComposeAsync(accountService::getAccountsInfo);
+        var loansInfoCF = currentCustomerCF.thenComposeAsync(loanService::getLoansInfo);
+        var creditScoreCF = currentCustomerCF.thenComposeAsync(creditScoreService::getCreditScore);
 
-    private record CustomerInfo(List<Account> accounts, List<Loan> loans) { }
-    private CustomerInfo getCustomerInfo(Customer customer) {
-        try (var scope = StructuredTaskScope.open()) {
-            var task1 = scope.fork(() -> accountService.getAccountsInfo(customer));
-            var task2 = scope.fork(() -> loanService.getLoansInfo(customer));
+        return CompletableFuture.allOf(currentCustomerCF, creditScoreCF, accountsInfoCF, loansInfoCF)
+                .thenCompose(_ -> {
+                    var currentCustomer = currentCustomerCF.join();
+                    var creditScore = (CreditScore) creditScoreCF.join();
+                    var accountsInfo = accountsInfoCF.join();
+                    var loansInfo = loansInfoCF.join();
 
-            scope.join();
-            var accountsInfo = task1.get();
-            var loansInfo = task2.get();
-
-            return new CustomerInfo(accountsInfo, loansInfo);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+                    return loanService.calculateOffer(currentCustomer, creditScore, accountsInfo, loansInfo);
+                });
     }
 }

@@ -1,12 +1,11 @@
 package com.balarawool.bootloom.abank.service;
 
-import com.balarawool.bootloom.abank.domain.Model;
+import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.concurrent.StructuredTaskScope;
-import java.util.concurrent.StructuredTaskScope.Joiner;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class CreditScoreService {
@@ -16,19 +15,17 @@ public class CreditScoreService {
         this.restClient = restClient;
     }
 
-    public Model.CreditScore getCreditScore(Customer customer) {
-        try (var scope = StructuredTaskScope.open(Joiner.<Model.CreditScore>anySuccessfulResultOrThrow())) {
-            scope.fork(() -> getCreditScoreFrom("/credit-score1", customer));
-            scope.fork(() -> getCreditScoreFrom("/credit-score2", customer));
+    public CompletableFuture<?> getCreditScore(Customer customer) {
+        var creditScore1CF = getCreditScoreFrom("/credit-score1", customer);
+        var creditScore2CF = getCreditScoreFrom("/credit-score2", customer);
 
-            var score = scope.join();
-            return score;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return CompletableFuture.anyOf(creditScore1CF, creditScore2CF);
     }
 
-    private Model.CreditScore getCreditScoreFrom(String endpoint, Customer customer) {
-        return restClient.get().uri("/customer/{id}"+endpoint, customer.id()).retrieve().body(Model.CreditScore.class);
+    private CompletableFuture<CreditScore> getCreditScoreFrom(String endpoint, Customer customer) {
+        return CompletableFuture.supplyAsync(() ->
+                restClient.get().uri("/customer/{id}"+endpoint, customer.id()).retrieve().body(CreditScore.class)
+        );
+
     }
 }

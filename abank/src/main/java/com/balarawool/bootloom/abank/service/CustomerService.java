@@ -4,6 +4,8 @@ import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 public class CustomerService {
     private RestClient restClient;
@@ -12,7 +14,9 @@ public class CustomerService {
         this.restClient = restClient;
     }
 
-    public Customer getCurrentCustomer() {
-        return restClient.get().uri("/current-customer").retrieve().body(Customer.class);
+    public CompletableFuture<Customer> getCurrentCustomer() {
+        return CompletableFuture.supplyAsync(() ->
+                restClient.get().uri("/current-customer").retrieve().body(Customer.class)
+        );
     }
 }

@@ -1,11 +1,12 @@
 package com.balarawool.bootloom.abank.service;
 
-import com.balarawool.bootloom.abank.domain.Model;
+import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class AccountService {
@@ -15,7 +16,9 @@ public class AccountService {
         this.restClient = restClient;
     }
 
-    public List<Model.Account> getAccountsInfo(Customer customer) {
-        return restClient.get().uri("/customer/{id}/accounts", customer.id()).retrieve().body(List.class);
+    public CompletableFuture<List<Account>> getAccountsInfo(Customer customer) {
+        return CompletableFuture.supplyAsync(() ->
+                (List<Account>) restClient.get().uri("/customer/{id}/accounts", customer.id()).retrieve().body(List.class)
+        );
     }
 }
