@@ -7,4 +7,10 @@ public interface Model {
     record Loan(String number, String amount) { }
     record Offer(String offerText) { }
     record CreditScore(String score) { }
+
+    class ABankException extends RuntimeException {
+        public ABankException(String message) {
+            super(message);
+        }
+    }
 }
