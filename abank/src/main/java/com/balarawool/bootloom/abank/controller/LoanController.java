@@ -1,9 +1,5 @@
 package com.balarawool.bootloom.abank.controller;
 
-import com.balarawool.bootloom.abank.domain.Model.Account;
-import com.balarawool.bootloom.abank.domain.Model.CreditScore;
-import com.balarawool.bootloom.abank.domain.Model.Customer;
-import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.LoanApplicationRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import com.balarawool.bootloom.abank.service.AccountService;
@@ -12,10 +8,8 @@ import com.balarawool.bootloom.abank.service.CustomerService;
 import com.balarawool.bootloom.abank.service.LoanService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.concurrent.StructuredTaskScope;
 
 @RestController

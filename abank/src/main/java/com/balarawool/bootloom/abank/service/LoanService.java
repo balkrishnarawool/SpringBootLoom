@@ -1,10 +1,10 @@
 package com.balarawool.bootloom.abank.service;
 
-import com.balarawool.bootloom.abank.domain.Model;
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
+import com.balarawool.bootloom.abank.domain.Model.LoanOfferRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class LoanService {
                                 String purpose) {
         logger.info("LoanService.calculateOffer(): Start");
 
-        var loanOfferRequest = new Model.LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
+        var loanOfferRequest = new LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
         var offer = restClient
                 .post()
                 .uri("/customer/{id}/loans/offer", customer.id())

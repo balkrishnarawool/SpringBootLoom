@@ -1,6 +1,5 @@
 package com.balarawool.bootloom.abank.service;
 
-import com.balarawool.bootloom.abank.domain.Model;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.slf4j.Logger;
