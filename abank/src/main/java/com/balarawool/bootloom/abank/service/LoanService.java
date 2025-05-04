@@ -6,6 +6,8 @@ import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @Service
 public class LoanService {
+    private static final Logger logger = LoggerFactory.getLogger(LoanService.class);
+
     private RestClient restClient;
 
     public LoanService(RestClient restClient) {
@@ -21,11 +25,16 @@ public class LoanService {
     }
 
     public List<Loan> getLoansInfo(Customer customer) {
-        return restClient
+        logger.info("LoanService.getLoansInfo(): Start");
+
+        var loans = restClient
                 .get()
                 .uri("/customer/{id}/loans", customer.id())
                 .retrieve()
-                .body(new ParameterizedTypeReference<>() { });
+                .body(new ParameterizedTypeReference<List<Loan>>() { });
+
+        logger.info("LoanService.getLoansInfo(): Done");
+        return loans;
     }
 
     public Offer calculateOffer(Customer customer,
@@ -34,12 +43,17 @@ public class LoanService {
                                 CreditScore creditScore,
                                 String amount,
                                 String purpose) {
+        logger.info("LoanService.calculateOffer(): Start");
+
         var loanOfferRequest = new Model.LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
-        return restClient
+        var offer = restClient
                 .post()
                 .uri("/customer/{id}/loans/offer", customer.id())
                 .body(loanOfferRequest)
                 .retrieve()
                 .body(Offer.class);
+
+        logger.info("LoanService.calculateOffer(): Done");
+        return  offer;
     }
 }

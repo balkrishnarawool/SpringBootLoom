@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.balarawool.bootloom.abank.services.util.ThreadUtil.logAndWait;
+import static com.balarawool.bootloom.abank.services.util.ServicesUtil.logAndWait;
 
 @RestController
 public class ServicesController {
