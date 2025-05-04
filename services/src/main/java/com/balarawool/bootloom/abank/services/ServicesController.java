@@ -1,6 +1,5 @@
 package com.balarawool.bootloom.abank.services;
 
-import com.balarawool.bootloom.abank.services.domain.Model;
 import com.balarawool.bootloom.abank.services.domain.Model.Account;
 import com.balarawool.bootloom.abank.services.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.services.domain.Model.Customer;
@@ -8,7 +7,6 @@ import com.balarawool.bootloom.abank.services.domain.Model.Loan;
 import com.balarawool.bootloom.abank.services.domain.Model.LoanOfferRequest;
 import com.balarawool.bootloom.abank.services.domain.Model.Offer;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.balarawool.bootloom.abank.services.util.ThreadUtil.logAndWait;
+import static com.balarawool.bootloom.abank.services.util.ServicesUtil.logAndWait;
 
 @RestController
 public class ServicesController {
