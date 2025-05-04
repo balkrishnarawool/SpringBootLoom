@@ -1,6 +1,5 @@
 package com.balarawool.bootloom.abank.services;
 
-import com.balarawool.bootloom.abank.services.domain.Model;
 import com.balarawool.bootloom.abank.services.domain.Model.Account;
 import com.balarawool.bootloom.abank.services.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.services.domain.Model.Customer;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.balarawool.bootloom.abank.services.util.ThreadUtil.logAndWait;
+import static com.balarawool.bootloom.abank.services.util.ServicesUtil.logAndWait;
 
 @RestController
 public class ServicesController {
