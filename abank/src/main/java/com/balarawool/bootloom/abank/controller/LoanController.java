@@ -2,15 +2,14 @@ package com.balarawool.bootloom.abank.controller;
 
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
-import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
-import com.balarawool.bootloom.abank.domain.RequestMetadata;
 import com.balarawool.bootloom.abank.service.AccountService;
 import com.balarawool.bootloom.abank.service.CreditScoreService;
 import com.balarawool.bootloom.abank.service.CustomerService;
 import com.balarawool.bootloom.abank.service.LoanService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,11 +24,10 @@ public class LoanController {
     private LoanService loanService;
     private CreditScoreService creditScoreService;
 
-    public LoanController(
-            CustomerService customerService,
-            AccountService accountService,
-            LoanService loanService,
-            CreditScoreService creditScoreService) {
+    public LoanController(CustomerService customerService,
+                          AccountService accountService,
+                          LoanService loanService,
+                          CreditScoreService creditScoreService) {
         this.customerService = customerService;
         this.accountService = accountService;
         this.loanService = loanService;
@@ -37,12 +35,14 @@ public class LoanController {
     }
 
     @GetMapping("/loan-application")
-    public Offer getLoan() {
-        var currentCustomer = customerService.getCurrentCustomer();
+    public Offer getLoan(@RequestParam("customerId") String customerId) {
+        var currentCustomer = customerService.getCustomer(customerId);
         return ScopedValue.where(CURRENT_CUSTOMER, currentCustomer)
                 .call(() -> {
                     var customerInfo = getCustomerInfo();
-                    var offer = loanService.calculateOffer(customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore());
+                    var offer = loanService.calculateOffer(
+                            customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore()
+                    );
                     return offer;
                 });
     }
