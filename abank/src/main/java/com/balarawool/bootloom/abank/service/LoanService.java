@@ -9,6 +9,8 @@ import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.LoanOfferRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import com.balarawool.bootloom.abank.domain.RequestMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -19,6 +21,8 @@ import static com.balarawool.bootloom.abank.domain.RequestMetadata.CURRENT_CUSTO
 
 @Service
 public class LoanService {
+    private static final Logger logger = LoggerFactory.getLogger(LoanService.class);
+
     private RestClient restClient;
 
     public LoanService(RestClient restClient) {
@@ -26,12 +30,17 @@ public class LoanService {
     }
 
     public List<Loan> getLoansInfo() {
+        logger.info("LoanService.getLoansInfo(): Start");
+
         var customer = CURRENT_CUSTOMER.orElseThrow(() -> new ABankException("No customer available"));
-        return restClient
+        var loans = restClient
                 .get()
                 .uri("/customer/{id}/loans", customer.id())
                 .retrieve()
-                .body(new ParameterizedTypeReference<>() { });
+                .body(new ParameterizedTypeReference<List<Loan>>() { });
+
+        logger.info("LoanService.getLoansInfo(): Done");
+        return loans;
     }
 
     public Offer calculateOffer(List<Account> accountsInfo,
@@ -39,13 +48,18 @@ public class LoanService {
                                 CreditScore creditScore,
                                 String amount,
                                 String purpose) {
+        logger.info("LoanService.calculateOffer(): Start");
+
         var customer = CURRENT_CUSTOMER.orElseThrow(() -> new ABankException("No customer available"));
         var loanOfferRequest = new LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
-        return restClient
+        var offer = restClient
                 .post()
                 .uri("/customer/{id}/loans/offer", customer.id())
                 .body(loanOfferRequest)
                 .retrieve()
                 .body(Offer.class);
+
+        logger.info("LoanService.calculateOffer(): Done");
+        return  offer;
     }
 }
