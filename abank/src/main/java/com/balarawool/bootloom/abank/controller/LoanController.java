@@ -3,13 +3,14 @@ package com.balarawool.bootloom.abank.controller;
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
+import com.balarawool.bootloom.abank.domain.Model.LoanApplicationRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import com.balarawool.bootloom.abank.service.AccountService;
 import com.balarawool.bootloom.abank.service.CreditScoreService;
 import com.balarawool.bootloom.abank.service.CustomerService;
 import com.balarawool.bootloom.abank.service.LoanService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -34,14 +35,14 @@ public class LoanController {
         this.creditScoreService = creditScoreService;
     }
 
-    @GetMapping("/loan-application")
-    public Offer getLoan(@RequestParam("customerId") String customerId) {
-        var currentCustomer = customerService.getCustomer(customerId);
+    @PostMapping("/loan-application")
+    public Offer applyForLoan(@RequestBody LoanApplicationRequest request) {
+        var currentCustomer = customerService.getCustomer(request.customerId());
         return ScopedValue.where(CURRENT_CUSTOMER, currentCustomer)
                 .call(() -> {
                     var customerInfo = getCustomerInfo();
                     var offer = loanService.calculateOffer(
-                            customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore()
+                            customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore(), request.amount(), request.purpose()
                     );
                     return offer;
                 });
