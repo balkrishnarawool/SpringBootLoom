@@ -14,9 +14,9 @@ public class CustomerService {
         this.restClient = restClient;
     }
 
-    public CompletableFuture<Customer> getCurrentCustomer() {
+    public CompletableFuture<Customer> getCustomer(String customerId) {
         return CompletableFuture.supplyAsync(() ->
-                restClient.get().uri("/current-customer").retrieve().body(Customer.class)
+                restClient.get().uri("/customer/{id}", customerId).retrieve().body(Customer.class)
         );
     }
 }

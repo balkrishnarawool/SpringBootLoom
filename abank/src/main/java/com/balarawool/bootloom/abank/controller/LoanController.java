@@ -7,6 +7,7 @@ import com.balarawool.bootloom.abank.service.CreditScoreService;
 import com.balarawool.bootloom.abank.service.CustomerService;
 import com.balarawool.bootloom.abank.service.LoanService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
@@ -30,8 +31,8 @@ public class LoanController {
     }
 
     @GetMapping("/loan-application")
-    public CompletableFuture<Offer> getLoan() {
-        var currentCustomerCF = customerService.getCurrentCustomer();
+    public CompletableFuture<Offer> getLoan(@RequestParam String customerId) {
+        var currentCustomerCF = customerService.getCustomer(customerId);
 
         var accountsInfoCF = currentCustomerCF.thenComposeAsync(accountService::getAccountsInfo);
         var loansInfoCF = currentCustomerCF.thenComposeAsync(loanService::getLoansInfo);
