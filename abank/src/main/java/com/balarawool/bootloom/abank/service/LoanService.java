@@ -1,10 +1,10 @@
 package com.balarawool.bootloom.abank.service;
 
-import com.balarawool.bootloom.abank.domain.Model;
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
+import com.balarawool.bootloom.abank.domain.Model.LoanOfferRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class LoanService {
                                                    CreditScore creditScore,
                                                    String amount,
                                                    String purpose) {
-        var loanOfferRequest = new Model.LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
+        var loanOfferRequest = new LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
         return CompletableFuture.supplyAsync(() -> restClient
                         .post()
                         .uri("/customer/{id}/loans/offer", customerId)
