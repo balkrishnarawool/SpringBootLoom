@@ -1,10 +1,12 @@
 package com.balarawool.bootloom.abank.service;
 
+import com.balarawool.bootloom.abank.domain.Model;
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -20,14 +22,27 @@ public class LoanService {
     }
 
     public CompletableFuture<List<Loan>> getLoansInfo(Customer customer) {
-        return CompletableFuture.supplyAsync(() ->
-                (List<Loan>) restClient.get().uri("/customer/{id}/loans", customer.id()).retrieve().body(List.class)
+        return CompletableFuture.supplyAsync(() -> restClient
+                        .get()
+                        .uri("/customer/{id}/loans", customer.id())
+                        .retrieve()
+                        .body(new ParameterizedTypeReference<>() { })
         );
     }
 
-    public CompletableFuture<Offer> calculateOffer(Customer customer, CreditScore creditScore, List<Account> accountsInfo, List<Loan> loansInfo) {
-        return CompletableFuture.supplyAsync(() ->
-            restClient.get().uri("/customer/{id}/loans/offer", customer.id()).retrieve().body(Offer.class)
+    public CompletableFuture<Offer> calculateOffer(String customerId,
+                                                   List<Account> accountsInfo,
+                                                   List<Loan> loansInfo,
+                                                   CreditScore creditScore,
+                                                   String amount,
+                                                   String purpose) {
+        var loanOfferRequest = new Model.LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
+        return CompletableFuture.supplyAsync(() -> restClient
+                        .post()
+                        .uri("/customer/{id}/loans/offer", customerId)
+                        .body(loanOfferRequest)
+                        .retrieve()
+                        .body(Offer.class)
         );
     }
 }
