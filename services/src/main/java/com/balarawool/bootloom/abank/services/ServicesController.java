@@ -4,9 +4,12 @@ import com.balarawool.bootloom.abank.services.domain.Model.Account;
 import com.balarawool.bootloom.abank.services.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.services.domain.Model.Customer;
 import com.balarawool.bootloom.abank.services.domain.Model.Loan;
+import com.balarawool.bootloom.abank.services.domain.Model.LoanOfferRequest;
 import com.balarawool.bootloom.abank.services.domain.Model.Offer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,7 +20,7 @@ import static com.balarawool.bootloom.abank.services.util.ThreadUtil.logAndWait;
 public class ServicesController {
     @GetMapping("/customer/{id}")
     public Customer getCustomer(@PathVariable("id") String customerId) {
-        logAndWait("currentCustomer");
+        logAndWait("getCustomer");
         return new Customer(customerId);
     }
 
@@ -45,9 +48,9 @@ public class ServicesController {
         return List.of(new Loan("TL123", "10000.00"), new Loan("CL456", "20000.00"));
     }
 
-    @GetMapping("/customer/{id}/loans/offer")
-    public Offer calculateOffer(@PathVariable("id") String customerId) {
+    @PostMapping("/customer/{id}/loans/offer")
+    public Offer calculateOffer(@PathVariable("id") String customerId, @RequestBody LoanOfferRequest request) {
         logAndWait("calculateOffer");
-        return new Offer("An offer for your loan application");
+        return new Offer("LMN123", request.amount(), request.purpose(), "4.00","An offer for your loan application");
     }
 }

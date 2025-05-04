@@ -1,10 +1,12 @@
 package com.balarawool.bootloom.abank.service;
 
+import com.balarawool.bootloom.abank.domain.Model;
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -19,10 +21,25 @@ public class LoanService {
     }
 
     public List<Loan> getLoansInfo(Customer customer) {
-        return restClient.get().uri("/customer/{id}/loans", customer.id()).retrieve().body(List.class);
+        return restClient
+                .get()
+                .uri("/customer/{id}/loans", customer.id())
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() { });
     }
 
-    public Offer calculateOffer(Customer customer, List<Account> accountsInfo, List<Loan> loansInfo, CreditScore creditScore) {
-        return restClient.get().uri("/customer/{id}/loans/offer", customer.id()).retrieve().body(Offer.class);
+    public Offer calculateOffer(Customer customer,
+                                List<Account> accountsInfo,
+                                List<Loan> loansInfo,
+                                CreditScore creditScore,
+                                String amount,
+                                String purpose) {
+        var loanOfferRequest = new Model.LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
+        return restClient
+                .post()
+                .uri("/customer/{id}/loans/offer", customer.id())
+                .body(loanOfferRequest)
+                .retrieve()
+                .body(Offer.class);
     }
 }

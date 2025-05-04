@@ -2,6 +2,7 @@ package com.balarawool.bootloom.abank.service;
 
 import com.balarawool.bootloom.abank.domain.Model;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -16,6 +17,11 @@ public class AccountService {
     }
 
     public List<Model.Account> getAccountsInfo(Customer customer) {
-        return restClient.get().uri("/customer/{id}/accounts", customer.id()).retrieve().body(List.class);
+        return restClient
+                .get()
+                .uri("/customer/{id}/accounts", customer.id())
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
     }
 }
