@@ -15,10 +15,10 @@ import static com.balarawool.bootloom.abank.services.util.ThreadUtil.logAndWait;
 
 @RestController
 public class ServicesController {
-    @GetMapping("/current-customer")
-    public Customer currentCustomer() {
+    @GetMapping("/customer/{id}")
+    public Customer getCustomer(@PathVariable("id") String customerId) {
         logAndWait("currentCustomer");
-        return new Customer("1234");
+        return new Customer(customerId);
     }
 
     @GetMapping("/customer/{id}/credit-score1")

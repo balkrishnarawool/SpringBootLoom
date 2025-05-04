@@ -10,6 +10,7 @@ import com.balarawool.bootloom.abank.service.CreditScoreService;
 import com.balarawool.bootloom.abank.service.CustomerService;
 import com.balarawool.bootloom.abank.service.LoanService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -34,8 +35,8 @@ public class LoanController {
     }
 
     @GetMapping("/loan-application")
-    public Offer getLoan() {
-        var currentCustomer = customerService.getCurrentCustomer();
+    public Offer getLoan(@RequestParam String customerId) {
+        var currentCustomer = customerService.getCustomer(customerId);
 
         try (var scope = StructuredTaskScope.open()) {
             var task1 = scope.fork(() -> accountService.getAccountsInfo(currentCustomer));

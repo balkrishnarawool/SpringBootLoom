@@ -12,7 +12,7 @@ public class CustomerService {
         this.restClient = restClient;
     }
 
-    public Customer getCurrentCustomer() {
-        return restClient.get().uri("/current-customer").retrieve().body(Customer.class);
+    public Customer getCustomer(String customerId) {
+        return restClient.get().uri("/customer/{id}", customerId).retrieve().body(Customer.class);
     }
 }
