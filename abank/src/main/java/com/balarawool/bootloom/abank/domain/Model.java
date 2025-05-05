@@ -16,5 +16,9 @@ public interface Model {
         public ABankException(String message) {
             super(message);
         }
+
+        public ABankException(Throwable th) {
+            super(th);
+        }
     }
 }

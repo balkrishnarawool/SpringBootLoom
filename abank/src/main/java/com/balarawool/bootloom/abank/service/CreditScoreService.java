@@ -31,7 +31,7 @@ public class CreditScoreService {
             var score = scope.join();
             return score;
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new ABankException(e);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.balarawool.bootloom.abank.controller;
 
+import com.balarawool.bootloom.abank.domain.Model.ABankException;
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
@@ -62,7 +63,7 @@ public class LoanController {
 
             return new CustomerInfo(accountsInfo, loansInfo, creditScore);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new ABankException(e);
         }
     }
 }
