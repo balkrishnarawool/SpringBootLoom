@@ -11,4 +11,14 @@ public interface Model {
     record CreditScore(String score) { }
     record LoanOfferRequest(List<Account> accounts, List<Loan> loans, String creditScore, String amount, String purpose) { }
     record Offer(String id, String amount, String purpose, String interest, String offerText) { }
+
+    class ABankException extends RuntimeException {
+        public ABankException(String message) {
+            super(message);
+        }
+
+        public ABankException(Throwable th) {
+            super(th);
+        }
+    }
 }
