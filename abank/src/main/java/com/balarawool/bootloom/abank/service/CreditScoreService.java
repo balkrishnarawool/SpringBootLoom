@@ -1,6 +1,6 @@
 package com.balarawool.bootloom.abank.service;
 
-import com.balarawool.bootloom.abank.domain.Model;
+import com.balarawool.bootloom.abank.domain.Model.ABankException;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class CreditScoreService {
 
         return CompletableFuture.anyOf(creditScore1CF, creditScore2CF)
                 .exceptionally(th -> {
-                    throw new Model.ABankException(th);
+                    throw new ABankException(th);
                 });
     }
 
