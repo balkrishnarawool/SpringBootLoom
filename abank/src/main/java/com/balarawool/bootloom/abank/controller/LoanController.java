@@ -1,5 +1,6 @@
 package com.balarawool.bootloom.abank.controller;
 
+import com.balarawool.bootloom.abank.domain.Model.ABankException;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import com.balarawool.bootloom.abank.domain.Model.LoanApplicationRequest;
@@ -39,6 +40,9 @@ public class LoanController {
         var creditScoreCF = currentCustomerCF.thenComposeAsync(creditScoreService::getCreditScore);
 
         return CompletableFuture.allOf(currentCustomerCF, creditScoreCF, accountsInfoCF, loansInfoCF)
+                .exceptionally(th -> {
+                    throw new ABankException(th);
+                })
                 .thenCompose(_ -> {
                     var currentCustomer = currentCustomerCF.join();
                     var creditScore = (CreditScore) creditScoreCF.join();

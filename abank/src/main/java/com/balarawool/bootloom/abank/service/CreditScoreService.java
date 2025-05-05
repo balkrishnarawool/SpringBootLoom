@@ -1,5 +1,6 @@
 package com.balarawool.bootloom.abank.service;
 
+import com.balarawool.bootloom.abank.domain.Model;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,15 @@ public class CreditScoreService {
         var creditScore1CF = getCreditScoreFrom("/credit-score1", customer);
         var creditScore2CF = getCreditScoreFrom("/credit-score2", customer);
 
-        return CompletableFuture.anyOf(creditScore1CF, creditScore2CF);
+        return CompletableFuture.anyOf(creditScore1CF, creditScore2CF)
+                .exceptionally(th -> {
+                    throw new Model.ABankException(th);
+                });
     }
 
     private CompletableFuture<CreditScore> getCreditScoreFrom(String endpoint, Customer customer) {
         return CompletableFuture.supplyAsync(() ->
                 restClient.get().uri("/customer/{id}"+endpoint, customer.id()).retrieve().body(CreditScore.class)
         );
-
     }
 }
