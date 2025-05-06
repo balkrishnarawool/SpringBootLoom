@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
-import static com.balarawool.bootloom.abank.domain.RequestMetadata.CURRENT_CUSTOMER;
+import static com.balarawool.bootloom.abank.domain.RequestContext.CURRENT_CUSTOMER;
 
 @Service
 public class LoanService {
