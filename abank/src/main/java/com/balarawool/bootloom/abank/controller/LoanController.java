@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.concurrent.StructuredTaskScope;
 
-import static com.balarawool.bootloom.abank.domain.RequestMetadata.CURRENT_CUSTOMER;
+import static com.balarawool.bootloom.abank.domain.RequestContext.CURRENT_CUSTOMER;
 
 @RestController
 public class LoanController {

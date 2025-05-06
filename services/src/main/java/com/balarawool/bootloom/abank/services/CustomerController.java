@@ -20,6 +20,7 @@ import static com.balarawool.bootloom.abank.services.util.ServicesUtil.logAndWai
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
+
     @GetMapping("/{id}")
     public Customer getCustomer(@PathVariable("id") String customerId) {
         logAndWait("getCustomer");
