@@ -6,6 +6,7 @@ import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.LoanApplicationRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
+import com.balarawool.bootloom.abank.domain.RequestContext;
 import com.balarawool.bootloom.abank.service.AccountService;
 import com.balarawool.bootloom.abank.service.CreditScoreService;
 import com.balarawool.bootloom.abank.service.CustomerService;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.concurrent.StructuredTaskScope;
-
-import static com.balarawool.bootloom.abank.domain.RequestContext.CURRENT_CUSTOMER;
 
 @RestController
 public class LoanController {
@@ -39,7 +38,7 @@ public class LoanController {
     @PostMapping("/loan-application")
     public Offer applyForLoan(@RequestBody LoanApplicationRequest request) {
         var currentCustomer = customerService.getCustomer(request.customerId());
-        return ScopedValue.where(CURRENT_CUSTOMER, currentCustomer)
+        return RequestContext.withCustomer(currentCustomer)
                 .call(() -> {
                     var customerInfo = getCustomerInfo();
                     var offer = loanService.calculateOffer(
