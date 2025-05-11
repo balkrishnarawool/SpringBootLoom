@@ -33,25 +33,30 @@ public class LoanController {
 
     @PostMapping("/loan-application")
     public CompletableFuture<Offer> applyForLoan(@RequestBody LoanApplicationRequest request)  {
-        var currentCustomerCF = customerService.getCustomer(request.customerId());
+        var currentCustomer = customerService.getCustomer(request.customerId())
+                .exceptionally(th -> {
+                    throw new ABankException(th);
+                })
+                .join();
 
-        var accountsInfoCF = currentCustomerCF.thenComposeAsync(accountService::getAccountsInfo);
-        var loansInfoCF = currentCustomerCF.thenComposeAsync(loanService::getLoansInfo);
-        var creditScoreCF = currentCustomerCF.thenComposeAsync(creditScoreService::getCreditScore);
+        var accountsInfoCF = accountService.getAccountsInfo(currentCustomer);
+        var loansInfoCF = loanService.getLoansInfo(currentCustomer);
+        var creditScoreCF = creditScoreService.getCreditScore(currentCustomer);
 
-        return CompletableFuture.allOf(currentCustomerCF, creditScoreCF, accountsInfoCF, loansInfoCF)
+        return CompletableFuture.allOf(creditScoreCF, accountsInfoCF, loansInfoCF)
                 .exceptionally(th -> {
                     throw new ABankException(th);
                 })
                 .thenCompose(_ -> {
-                    var currentCustomer = currentCustomerCF.join();
                     var creditScore = (CreditScore) creditScoreCF.join();
                     var accountsInfo = accountsInfoCF.join();
                     var loansInfo = loansInfoCF.join();
 
                     var offer = loanService.calculateOffer(
                             currentCustomer.id(), accountsInfo, loansInfo, creditScore, request.amount(), request.purpose()
-                    );
+                    ).exceptionally(th -> {
+                        throw new ABankException(th);
+                    });
                     return offer;
                 });
     }
