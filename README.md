@@ -11,7 +11,7 @@ This Maven project has two modules: `abank` and `services`
 
 ## Pre-requisites
 
-This project requires JDK 24 (Project Loom early access build).
-You can download Project Loom early access builds from [https://jdk.java.net/loom/](https://jdk.java.net/loom/)
+This project requires JDK 25 (Project Loom early-access build).
+You can download Project Loom early-access builds from [https://jdk.java.net/loom/](https://jdk.java.net/loom/)
 
 Also, make sure to set `--enable-preview` as VM argument while running these spring-boot apps.
