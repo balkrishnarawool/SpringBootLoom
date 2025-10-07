@@ -2,6 +2,7 @@ package com.balarawool.bootloom.abank.service;
 
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
+import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.LoanOfferRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
@@ -24,28 +25,31 @@ public class LoanService {
         this.restClient = restClient;
     }
 
-    public List<Loan> getLoansInfo() {
-        logger.info("LoanService.getLoansInfo(): Start");
+    public List<Loan> getLoansInfo(Customer customer) {
+        var requestId = RequestContext.getRequestId();
 
-        var customer = RequestContext.getCurrentCustomer();
+        logger.info("{} LoanService.getLoansInfo(): Start", requestId);
+
         var loans = restClient
                 .get()
                 .uri("/customer/{id}/loans", customer.id())
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<Loan>>() { });
 
-        logger.info("LoanService.getLoansInfo(): Done");
+        logger.info("{} LoanService.getLoansInfo(): Done", requestId);
         return loans;
     }
 
-    public Offer calculateOffer(List<Account> accountsInfo,
+    public Offer calculateOffer(Customer customer,
+                                List<Account> accountsInfo,
                                 List<Loan> loansInfo,
                                 CreditScore creditScore,
                                 String amount,
                                 String purpose) {
-        logger.info("LoanService.calculateOffer(): Start");
+        var requestId = RequestContext.getRequestId();
 
-        var customer = RequestContext.getCurrentCustomer();
+        logger.info("{} LoanService.calculateOffer(): Start", requestId);
+
         var loanOfferRequest = new LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
         var offer = restClient
                 .post()
@@ -54,7 +58,7 @@ public class LoanService {
                 .retrieve()
                 .body(Offer.class);
 
-        logger.info("LoanService.calculateOffer(): Done");
+        logger.info("{} LoanService.calculateOffer(): Done", requestId);
         return  offer;
     }
 }

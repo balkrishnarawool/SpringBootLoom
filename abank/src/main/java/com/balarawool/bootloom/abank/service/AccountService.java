@@ -1,6 +1,7 @@
 package com.balarawool.bootloom.abank.service;
 
 import com.balarawool.bootloom.abank.domain.Model.Account;
+import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,17 +21,18 @@ public class AccountService {
         this.restClient = restClient;
     }
 
-    public List<Account> getAccountsInfo() {
-        logger.info("AccountService.getAccountsInfo(): Start");
+    public List<Account> getAccountsInfo(Customer customer) {
+        var requestId = RequestContext.getRequestId();
 
-        var customer = RequestContext.getCurrentCustomer();
+        logger.info("{} AccountService.getAccountsInfo(): Start", requestId);
+
         var accounts = restClient
                 .get()
                 .uri("/customer/{id}/accounts", customer.id())
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<Account>>() { });
 
-        logger.info("AccountService.getAccountsInfo(): Done");
+        logger.info("{} AccountService.getAccountsInfo(): Done", requestId);
         return accounts;
     }
 }
