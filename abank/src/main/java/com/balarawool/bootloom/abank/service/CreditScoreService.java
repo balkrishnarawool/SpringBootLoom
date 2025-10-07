@@ -17,8 +17,8 @@ public class CreditScoreService {
     }
 
     public CompletableFuture<?> getCreditScore(Customer customer) {
-        var creditScore1CF = getCreditScoreFrom("/credit-score1", customer);
-        var creditScore2CF = getCreditScoreFrom("/credit-score2", customer);
+        var creditScore1CF = getCreditScoreFrom("credit-score1", customer);
+        var creditScore2CF = getCreditScoreFrom("credit-score2", customer);
 
         return CompletableFuture.anyOf(creditScore1CF, creditScore2CF)
                 .exceptionally(th -> {
@@ -28,7 +28,7 @@ public class CreditScoreService {
 
     private CompletableFuture<CreditScore> getCreditScoreFrom(String endpoint, Customer customer) {
         return CompletableFuture.supplyAsync(() ->
-                restClient.get().uri("/customer/{id}"+endpoint, customer.id()).retrieve().body(CreditScore.class)
+                restClient.get().uri("/customer/{id}/{endpoint}", customer.id(), endpoint).retrieve().body(CreditScore.class)
         );
     }
 }
