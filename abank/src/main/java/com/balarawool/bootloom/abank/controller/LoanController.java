@@ -3,6 +3,7 @@ package com.balarawool.bootloom.abank.controller;
 import com.balarawool.bootloom.abank.domain.Model.ABankException;
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
+import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.LoanApplicationRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.StructuredTaskScope;
 
 @RestController
@@ -37,23 +39,26 @@ public class LoanController {
 
     @PostMapping("/loan-application")
     public Offer applyForLoan(@RequestBody LoanApplicationRequest request) {
-        var currentCustomer = customerService.getCustomer(request.customerId());
-        return RequestContext.withCustomer(currentCustomer)
+        var requestID = UUID.randomUUID();
+
+        return RequestContext.withRequestId(requestID)
                 .call(() -> {
-                    var customerInfo = getCustomerInfo();
+                    var currentCustomer = customerService.getCustomer(request.customerId());
+
+                    var customerInfo = getCustomerInfo(currentCustomer);
                     var offer = loanService.calculateOffer(
-                            customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore(), request.amount(), request.purpose()
+                            currentCustomer, customerInfo.accounts(), customerInfo.loans(), customerInfo.creditScore(), request.amount(), request.purpose()
                     );
                     return offer;
                 });
     }
 
     private record CustomerInfo(List<Account> accounts, List<Loan> loans, CreditScore creditScore) { }
-    private CustomerInfo getCustomerInfo() {
+    private CustomerInfo getCustomerInfo(Customer customer) {
         try (var scope = StructuredTaskScope.open()) {
-            var task1 = scope.fork(accountService::getAccountsInfo);
-            var task2 = scope.fork(loanService::getLoansInfo);
-            var task3 = scope.fork(creditScoreService::getCreditScore);
+            var task1 = scope.fork(() -> accountService.getAccountsInfo(customer));
+            var task2 = scope.fork(() -> loanService.getLoansInfo(customer));
+            var task3 = scope.fork(() -> creditScoreService.getCreditScore(customer));
 
             scope.join();
             var accountsInfo = task1.get();
