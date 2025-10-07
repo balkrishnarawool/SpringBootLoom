@@ -24,8 +24,8 @@ public class CreditScoreService {
 
     public CreditScore getCreditScore(Customer customer) {
         try (var scope = StructuredTaskScope.open(Joiner.<CreditScore>anySuccessfulResultOrThrow())) {
-            scope.fork(() -> getCreditScoreFrom("/credit-score1", customer));
-            scope.fork(() -> getCreditScoreFrom("/credit-score2", customer));
+            scope.fork(() -> getCreditScoreFrom("credit-score1", customer));
+            scope.fork(() -> getCreditScoreFrom("credit-score2", customer));
 
             var score = scope.join();
             return score;
@@ -39,7 +39,7 @@ public class CreditScoreService {
 
         logger.info("{} CreditScoreService.getCreditScore() with {}: Start", requestId, endpoint);
 
-        var score = restClient.get().uri("/customer/{id}"+endpoint, customer.id()).retrieve().body(CreditScore.class);
+        var score = restClient.get().uri("/customer/{id}/{endpoint}", customer.id(), endpoint).retrieve().body(CreditScore.class);
         logger.info("{} CreditScoreService.getCreditScore() with {}: Done", requestId, endpoint);
 
         return score;
