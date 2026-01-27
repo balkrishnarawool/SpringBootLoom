@@ -1,6 +1,9 @@
 package com.balarawool.bootloom.abank.domain;
 
+import java.net.URI;
+import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 public interface Model {
 
@@ -21,4 +24,14 @@ public interface Model {
             super(th);
         }
     }
+
+    record Node(String id, URI healthUri) { }
+    record Region(String name, List<Node> nodes) { }
+    record NodeProbe(String nodeId, boolean ok, Duration latency, Optional<String> error) { }
+    record RegionProbeResult(String region,
+                                    int okCount,
+                                    int totalCount,
+                                    boolean active,
+                                    List<NodeProbe> details) { }
+
 }
