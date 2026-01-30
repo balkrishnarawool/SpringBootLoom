@@ -1,6 +1,6 @@
 # SpringBoot and Project Loom
 
-This repo is to show how Project Loom's features can be used in SpringBoot apps.
+This repo shows how Project Loom's features can be used in SpringBoot apps.
 It contains source code for 2 of my talks:
 - Virtual Threads, Structured Concurrency and Scoped Values: Putting it all together
   - This talk explains the 3 main features of Project Loom and explores their API
