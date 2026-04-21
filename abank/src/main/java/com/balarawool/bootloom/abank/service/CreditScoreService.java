@@ -23,7 +23,7 @@ public class CreditScoreService {
     }
 
     public CreditScore getCreditScore(Customer customer) {
-        try (var scope = StructuredTaskScope.open(Joiner.<CreditScore>anySuccessfulResultOrThrow())) {
+        try (var scope = StructuredTaskScope.open(Joiner.<CreditScore>anySuccessfulOrThrow())) {
             scope.fork(() -> getCreditScoreFrom("credit-score1", customer));
             scope.fork(() -> getCreditScoreFrom("credit-score2", customer));
 
