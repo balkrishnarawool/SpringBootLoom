@@ -26,5 +26,5 @@ There are 5 branches
 
 ## Pre-requisites
 
-This project requires JDK 25.
+This project requires JDK 26.
 Also, make sure to set `--enable-preview` as VM argument while running these spring-boot apps.
