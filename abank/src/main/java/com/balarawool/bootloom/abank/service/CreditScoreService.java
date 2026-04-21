@@ -1,5 +1,6 @@
 package com.balarawool.bootloom.abank.service;
 
+import com.balarawool.bootloom.abank.domain.Model.ABankException;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.slf4j.Logger;
@@ -21,14 +22,14 @@ public class CreditScoreService {
     }
 
     public CreditScore getCreditScore(Customer customer) {
-        try (var scope = StructuredTaskScope.open(Joiner.<CreditScore>anySuccessfulResultOrThrow())) {
+        try (var scope = StructuredTaskScope.open(Joiner.<CreditScore>anySuccessfulOrThrow())) {
             scope.fork(() -> getCreditScoreFrom("credit-score1", customer));
             scope.fork(() -> getCreditScoreFrom("credit-score2", customer));
 
             var score = scope.join();
             return score;
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new ABankException(e);
         }
     }
 
