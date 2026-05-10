@@ -2,7 +2,6 @@ package com.balarawool.bootloom.abank.service;
 
 import com.balarawool.bootloom.abank.domain.Model.Account;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
-import com.balarawool.bootloom.abank.domain.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,9 +21,7 @@ public class AccountService {
     }
 
     public List<Account> getAccountsInfo(Customer customer) {
-        var requestId = RequestContext.getRequestId();
-
-        logger.info("{} AccountService.getAccountsInfo(): Start", requestId);
+        logger.info("AccountService.getAccountsInfo(): Start");
 
         var accounts = restClient
                 .get()
@@ -32,7 +29,7 @@ public class AccountService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<Account>>() { });
 
-        logger.info("{} AccountService.getAccountsInfo(): Done", requestId);
+        logger.info("AccountService.getAccountsInfo(): Done");
         return accounts;
     }
 }
