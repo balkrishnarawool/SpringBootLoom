@@ -6,6 +6,7 @@ import com.balarawool.bootloom.abank.domain.Model.Customer;
 import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.LoanOfferRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
+import com.balarawool.bootloom.abank.domain.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,7 +26,9 @@ public class LoanService {
     }
 
     public List<Loan> getLoansInfo(Customer customer) {
-        logger.info("LoanService.getLoansInfo(): Start");
+        final var requestId = RequestContext.REQUEST_ID.get();
+
+        logger.info("{} LoanService.getLoansInfo(): Start", requestId);
 
         var loans = restClient
                 .get()
@@ -33,7 +36,7 @@ public class LoanService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<Loan>>() { });
 
-        logger.info("LoanService.getLoansInfo(): Done");
+        logger.info("{} LoanService.getLoansInfo(): Done", requestId);
         return loans;
     }
 
@@ -43,7 +46,9 @@ public class LoanService {
                                 CreditScore creditScore,
                                 String amount,
                                 String purpose) {
-        logger.info("LoanService.calculateOffer(): Start");
+        final var requestId = RequestContext.REQUEST_ID.get();
+
+        logger.info("{} LoanService.calculateOffer(): Start", requestId);
 
         var loanOfferRequest = new LoanOfferRequest(accountsInfo, loansInfo, creditScore.score(), amount, purpose);
         var offer = restClient
@@ -53,7 +58,7 @@ public class LoanService {
                 .retrieve()
                 .body(Offer.class);
 
-        logger.info("LoanService.calculateOffer(): Done");
+        logger.info("{} LoanService.calculateOffer(): Done", requestId);
         return  offer;
     }
 }

@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.StructuredTaskScope;
+
+import static com.balarawool.bootloom.abank.domain.RequestContext.REQUEST_ID;
 
 @RestController
 public class LoanController {
@@ -34,16 +37,21 @@ public class LoanController {
 
     @PostMapping("/loan-application")
     public Offer applyForLoan(@RequestBody LoanApplicationRequest request) {
-        final var currentCustomer = customerService.getCustomer(request.customerId());
-
-        final var customerInfo = getCustomerInfo(request, currentCustomer);
-        final var offer = loanService.calculateOffer(
-                currentCustomer, customerInfo.accounts, customerInfo.loans, customerInfo.creditScore, request.amount(), request.purpose()
-        );
-        return offer;
+        final var requestId = UUID.randomUUID();
+        return ScopedValue.where(REQUEST_ID, requestId)
+                .call(() -> {
+                    final var currentCustomer = customerService.getCustomer(request.customerId());
+                    final var customerInfo = getCustomerInfo(request, currentCustomer);
+                    final var offer = loanService.calculateOffer(
+                            currentCustomer, customerInfo.accounts, customerInfo.loans, customerInfo.creditScore, request.amount(), request.purpose()
+                    );
+                    return offer;
+                });
     }
 
-    private record CustomerInfo(List<Account> accounts, List<Loan> loans, CreditScore creditScore) { }
+    private record CustomerInfo(List<Account> accounts, List<Loan> loans, CreditScore creditScore) {
+    }
+
     private CustomerInfo getCustomerInfo(LoanApplicationRequest request, Customer currentCustomer) {
         try (var scope = StructuredTaskScope.open()) {
             final var task1 = scope.fork(() -> accountService.getAccountsInfo(currentCustomer));
