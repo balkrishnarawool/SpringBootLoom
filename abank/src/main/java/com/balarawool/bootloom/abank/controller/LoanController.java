@@ -1,6 +1,10 @@
 package com.balarawool.bootloom.abank.controller;
 
 import com.balarawool.bootloom.abank.domain.Model.ABankException;
+import com.balarawool.bootloom.abank.domain.Model.Account;
+import com.balarawool.bootloom.abank.domain.Model.CreditScore;
+import com.balarawool.bootloom.abank.domain.Model.Customer;
+import com.balarawool.bootloom.abank.domain.Model.Loan;
 import com.balarawool.bootloom.abank.domain.Model.LoanApplicationRequest;
 import com.balarawool.bootloom.abank.domain.Model.Offer;
 import com.balarawool.bootloom.abank.service.AccountService;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.concurrent.StructuredTaskScope;
 
 @RestController
@@ -31,6 +36,15 @@ public class LoanController {
     public Offer applyForLoan(@RequestBody LoanApplicationRequest request) {
         final var currentCustomer = customerService.getCustomer(request.customerId());
 
+        final var customerInfo = getCustomerInfo(request, currentCustomer);
+        final var offer = loanService.calculateOffer(
+                currentCustomer, customerInfo.accounts, customerInfo.loans, customerInfo.creditScore, request.amount(), request.purpose()
+        );
+        return offer;
+    }
+
+    private record CustomerInfo(List<Account> accounts, List<Loan> loans, CreditScore creditScore) { }
+    private CustomerInfo getCustomerInfo(LoanApplicationRequest request, Customer currentCustomer) {
         try (var scope = StructuredTaskScope.open()) {
             final var task1 = scope.fork(() -> accountService.getAccountsInfo(currentCustomer));
             final var task2 = scope.fork(() -> loanService.getLoansInfo(currentCustomer));
@@ -42,11 +56,9 @@ public class LoanController {
             final var loans = task2.get();
             final var creditScore = task3.get();
 
-            final var offer = loanService.calculateOffer(currentCustomer, accounts, loans, creditScore, request.amount(), request.purpose());
-            return offer;
+            return new CustomerInfo(accounts, loans, creditScore);
         } catch (InterruptedException e) {
             throw new ABankException(e);
         }
-
     }
 }
