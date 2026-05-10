@@ -1,15 +1,11 @@
 package com.balarawool.bootloom.abank.service;
 
-import com.balarawool.bootloom.abank.domain.Model.ABankException;
 import com.balarawool.bootloom.abank.domain.Model.CreditScore;
 import com.balarawool.bootloom.abank.domain.Model.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import java.util.concurrent.StructuredTaskScope;
-import java.util.concurrent.StructuredTaskScope.Joiner;
 
 @Service
 public class CreditScoreService {
@@ -22,15 +18,7 @@ public class CreditScoreService {
     }
 
     public CreditScore getCreditScore(Customer customer) {
-        try (var scope = StructuredTaskScope.open(Joiner.<CreditScore>anySuccessfulOrThrow())) {
-            scope.fork(() -> getCreditScoreFrom("credit-score1", customer));
-            scope.fork(() -> getCreditScoreFrom("credit-score2", customer));
-
-            var score = scope.join();
-            return score;
-        } catch (InterruptedException e) {
-            throw new ABankException(e);
-        }
+        return null;
     }
 
     private CreditScore getCreditScoreFrom(String endpoint, Customer customer) {
